@@ -55,12 +55,12 @@ def preprocess_folder(input_root: str, output_root: str):
     print("Selesai preprocessing semua kelas!")
 
 
-if __name__ == "__main__":
-    # base_dir = folder root project (tb-cxr-detection)
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# if __name__ == "__main__":
+#     # base_dir = folder root project (tb-cxr-detection)
+#     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    # path input & output relatif dari base_dir
-    input_root = os.path.join("D:/Bismillah Kuliah/Semester 3/PCD/Final Project/tb-cxr-detection/data/raw/TB_Chest_Radiography_Database")
-    output_root = os.path.join("D:/Bismillah Kuliah/Semester 3/PCD/Final Project/tb-cxr-detection/data/preprocessed")
+#     # path input & output relatif dari base_dir
+#     input_root = os.path.join("D:/Bismillah Kuliah/Semester 3/PCD/Final Project/tb-cxr-detection/data/raw/TB_Chest_Radiography_Database")
+#     output_root = os.path.join("D:/Bismillah Kuliah/Semester 3/PCD/Final Project/tb-cxr-detection/data/preprocessed")
 
-    preprocess_folder(input_root, output_root)
+#     preprocess_folder(input_root, output_root)
