@@ -5,3 +5,5 @@ pyyaml
 fastapi
 uvicorn
 pytest
+scikit-learn
+matplotlib
