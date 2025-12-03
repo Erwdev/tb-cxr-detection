@@ -3,23 +3,7 @@ import cv2
 from skimage.feature import local_binary_pattern, graycomatrix, graycoprops
 
 def extract_lbp_features(img: np.ndarray, mask: np.ndarray = None) -> dict:
-    """
-    Extracts texture and shape features from a grayscale image, optionally limited to a masked region.
-
-    Args:
-        img (np.ndarray): Grayscale input image as a 2D NumPy array.
-        mask (np.ndarray, optional): Binary mask of the same size as `img`. 
-                                    Only the masked region will be used for feature extraction.
-                                    Defaults to None (use entire image).
-
-    Returns:
-        dict: A dictionary containing extracted features:
-            - 'edge_sum' (float): Sum of Canny edge pixels.
-            - 'num_lines' (int): Number of lines detected by Hough transform.
-            - 'glcm_contrast' (float): Contrast from Gray-Level Co-occurrence Matrix.
-            - 'glcm_homogenity' (float): Homogeneity from GLCM.
-            - 'lbp_hist' (list of float): Normalized histogram of Local Binary Pattern.
-    """
+    
 
     # masking gambar ke ROI jika belum berupa mask 
     if mask is not None:

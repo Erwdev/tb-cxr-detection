@@ -1,9 +1,12 @@
 opencv-python
 numpy
+pandas
+scikit-learn
 scikit-image
+matplotlib
+joblib
+imbalanced-learn
 pyyaml
 fastapi
 uvicorn
 pytest
-scikit-learn
-matplotlib
