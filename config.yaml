@@ -1,0 +1,13 @@
+preprocessing:
+  clahe_clip_limit: 2.0
+  clahe_tile_size: 8
+  gaussian_kernel: 3
+
+segmentation:
+  kmeans_clusters: 3
+  adaptive_block_size: 21
+
+feature_extraction:
+  lbp_points: 8
+  lbp_radius: 1
+  glcm_distance: 1
