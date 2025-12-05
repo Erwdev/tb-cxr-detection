@@ -36,86 +36,268 @@ st.set_page_config(
 )
 
 # ============================================================================
-# CUSTOM CSS FOR MARQUEE
+# CUSTOM CSS - MONOCHROME BLACK & WHITE
 # ============================================================================
 st.markdown("""
 <style>
-    .marquee-container {
-        width: 100%;
-        overflow: hidden;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 20px 0;
-        border-radius: 10px;
-        margin: 20px 0;
+    /* Main container styling */
+    .main {
+        background-color: #ffffff;
     }
     
-    .marquee {
+    /* Hero section */
+    .hero-title {
+        font-size: 3.5em;
+        font-weight: 800;
+        color: #000000;
+        text-align: center;
+        margin: 40px 0 20px 0;
+        letter-spacing: -1px;
+        line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3em;
+        color: #666666;
+        text-align: center;
+        margin-bottom: 50px;
+        font-weight: 300;
+    }
+    
+    /* Pipeline steps */
+    .pipeline-container {
         display: flex;
-        animation: scroll 30s linear infinite;
-        white-space: nowrap;
-    }
-    
-    .marquee-item {
-        display: inline-flex;
-        align-items: center;
-        margin: 0 30px;
-        padding: 15px 25px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50px;
-        backdrop-filter: blur(10px);
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.3s ease;
-    }
-    
-    .marquee-item:hover {
-        transform: scale(1.1);
-        background: rgba(255, 255, 255, 0.2);
-    }
-    
-    .marquee-icon {
-        font-size: 24px;
-        margin-right: 10px;
-    }
-    
-    .marquee-text {
-        font-size: 16px;
-        font-weight: 600;
-        color: white;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    
-    @keyframes scroll {
-        0% {
-            transform: translateX(0);
-        }
-        100% {
-            transform: translateX(-50%);
-        }
+        justify-content: space-between;
+        gap: 20px;
+        margin: 40px 0;
     }
     
     .pipeline-step {
+        flex: 1;
         text-align: center;
-        padding: 20px;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        border-radius: 10px;
-        margin: 10px;
-        color: white;
-        font-weight: bold;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        transition: transform 0.3s ease;
+        padding: 30px 20px;
+        background: #f8f9fa;
+        border: 2px solid #000000;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        position: relative;
     }
     
     .pipeline-step:hover {
+        background: #000000;
+        color: #ffffff;
         transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    .pipeline-step:hover .step-icon {
+        color: #ffffff;
+    }
+    
+    .pipeline-step:hover .step-number {
+        background: #ffffff;
+        color: #000000;
+    }
+    
+    .step-number {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        border-radius: 50%;
+        background: #000000;
+        color: #ffffff;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+    
+    .step-icon {
+        font-size: 2em;
+        margin-bottom: 10px;
+        color: #000000;
+    }
+    
+    .step-title {
+        font-size: 1.1em;
+        font-weight: 700;
+        margin: 10px 0;
+        color: inherit;
+    }
+    
+    .step-description {
+        font-size: 0.9em;
+        color: #666666;
+        margin-top: 5px;
+    }
+    
+    .pipeline-step:hover .step-description {
+        color: #cccccc;
+    }
+    
+    /* Arrow between steps */
+    .pipeline-arrow {
+        position: absolute;
+        right: -30px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 2em;
+        color: #cccccc;
+    }
+    
+    /* Feature cards */
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        margin: 40px 0;
     }
     
     .feature-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 40px 30px;
+        background: #ffffff;
+        border: 2px solid #000000;
+        border-radius: 8px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        background: #000000;
+        color: #ffffff;
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .feature-card:hover .feature-icon {
+        color: #ffffff;
+    }
+    
+    .feature-icon {
+        font-size: 3em;
+        margin-bottom: 20px;
+        color: #000000;
+    }
+    
+    .feature-title {
+        font-size: 1.3em;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: inherit;
+    }
+    
+    .feature-description {
+        font-size: 1em;
+        color: #666666;
+        line-height: 1.6;
+    }
+    
+    .feature-card:hover .feature-description {
+        color: #cccccc;
+    }
+    
+    /* Stats section */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin: 40px 0;
+        padding: 40px;
+        background: #f8f9fa;
+        border: 2px solid #000000;
+        border-radius: 8px;
+    }
+    
+    .stat-item {
+        text-align: center;
         padding: 20px;
-        border-radius: 10px;
-        color: white;
-        margin: 10px 0;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        border-right: 1px solid #dddddd;
+    }
+    
+    .stat-item:last-child {
+        border-right: none;
+    }
+    
+    .stat-number {
+        font-size: 2.5em;
+        font-weight: 800;
+        color: #000000;
+        margin-bottom: 10px;
+    }
+    
+    .stat-label {
+        font-size: 0.9em;
+        color: #666666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Section headers */
+    .section-header {
+        font-size: 2em;
+        font-weight: 700;
+        color: #000000;
+        text-align: center;
+        margin: 60px 0 30px 0;
+        position: relative;
+        padding-bottom: 15px;
+    }
+    
+    .section-header:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: #000000;
+    }
+    
+    /* CTA section */
+    .cta-container {
+        text-align: center;
+        padding: 50px;
+        background: #000000;
+        color: #ffffff;
+        border-radius: 8px;
+        margin: 40px 0;
+    }
+    
+    .cta-title {
+        font-size: 2em;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    
+    .cta-description {
+        font-size: 1.2em;
+        color: #cccccc;
+        margin-bottom: 30px;
+    }
+    
+    /* Technique badges */
+    .technique-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+        margin: 30px 0;
+    }
+    
+    .technique-badge {
+        padding: 15px;
+        background: #ffffff;
+        border: 2px solid #000000;
+        border-radius: 50px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.9em;
+        transition: all 0.3s ease;
+    }
+    
+    .technique-badge:hover {
+        background: #000000;
+        color: #ffffff;
+        transform: scale(1.05);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -151,173 +333,252 @@ def create_progress_callback(progress_bar, status_text):
 # LANDING PAGE COMPONENTS
 # ============================================================================
 def render_landing_page():
-    """Render landing page with animated pipeline"""
+    """Render landing page with monochrome black & white design"""
     
     # Hero section
     st.markdown("""
-    <div style='text-align: center; padding: 40px 0;'>
-        <h1 style='font-size: 3em; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                   -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
-            🫁 TB Chest X-Ray Detection
-        </h1>
-        <p style='font-size: 1.2em; color: #666; margin-top: 10px;'>
-            AI-Powered Tuberculosis Detection from Medical Imaging
-        </p>
+    <div class="hero-title">
+        🫁 TB Chest X-Ray Detection
+    </div>
+    <div class="hero-subtitle">
+        AI-Powered Tuberculosis Detection from Medical Imaging
     </div>
     """, unsafe_allow_html=True)
     
-    # Marquee of techniques
-    techniques = [
-        ("🔄", "K-Means Clustering"),
-        ("✨", "CLAHE Enhancement"),
-        ("🌀", "Gaussian Blur"),
-        ("🔍", "LBP Features"),
-        ("📊", "GLCM Texture"),
-        ("📏", "Hough Transform"),
-        ("🌳", "SLDT Classifier"),
-        ("🦋", "MSA Optimization"),
-        ("⚙️", "Morphology Ops"),
-        ("🎯", "Edge Detection"),
-    ]
-    
-    # Double the techniques for seamless loop
-    techniques_doubled = techniques + techniques
-    
-    marquee_html = """
-    <div class="marquee-container">
-        <div class="marquee">
-    """
-    
-    for icon, name in techniques_doubled:
-        marquee_html += f"""
-            <div class="marquee-item">
-                <span class="marquee-icon">{icon}</span>
-                <span class="marquee-text">{name}</span>
-            </div>
-        """
-    
-    marquee_html += """
+    # Stats section
+    st.markdown("""
+    <div class="stats-container">
+        <div class="stat-item">
+            <div class="stat-number">14</div>
+            <div class="stat-label">Features</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">5</div>
+            <div class="stat-label">Pipeline Steps</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">10+</div>
+            <div class="stat-label">Algorithms</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">2</div>
+            <div class="stat-label">Classes</div>
         </div>
     </div>
-    """
+    """, unsafe_allow_html=True)
     
-    st.markdown(marquee_html, unsafe_allow_html=True)
-    
-    # Pipeline explanation
-    st.markdown("### 🔄 Complete Processing Pipeline")
+    # Section: Processing Pipeline
+    st.markdown('<div class="section-header">Processing Pipeline</div>', unsafe_allow_html=True)
     
     col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
         st.markdown("""
         <div class="pipeline-step">
-            📥<br>Preprocessing<br>
-            <small>CLAHE + Gaussian</small>
+            <div class="step-number">1</div>
+            <div class="step-icon">📥</div>
+            <div class="step-title">Preprocessing</div>
+            <div class="step-description">CLAHE + Gaussian Blur</div>
         </div>
         """, unsafe_allow_html=True)
     
     with col2:
         st.markdown("""
         <div class="pipeline-step">
-            🎯<br>Segmentation<br>
-            <small>K-Means (k=3)</small>
+            <div class="step-number">2</div>
+            <div class="step-icon">🎯</div>
+            <div class="step-title">Segmentation</div>
+            <div class="step-description">K-Means Clustering</div>
         </div>
         """, unsafe_allow_html=True)
     
     with col3:
         st.markdown("""
         <div class="pipeline-step">
-            ⚙️<br>Morphology<br>
-            <small>Erosion + Dilation</small>
+            <div class="step-number">3</div>
+            <div class="step-icon">⚙️</div>
+            <div class="step-title">Morphology</div>
+            <div class="step-description">Erosion + Dilation</div>
         </div>
         """, unsafe_allow_html=True)
     
     with col4:
         st.markdown("""
         <div class="pipeline-step">
-            📊<br>Features<br>
-            <small>LBP + GLCM + Hough</small>
+            <div class="step-number">4</div>
+            <div class="step-icon">📊</div>
+            <div class="step-title">Features</div>
+            <div class="step-description">LBP + GLCM + Hough</div>
         </div>
         """, unsafe_allow_html=True)
     
     with col5:
         st.markdown("""
         <div class="pipeline-step">
-            🤖<br>Classification<br>
-            <small>SLDT + MSA</small>
+            <div class="step-number">5</div>
+            <div class="step-icon">🤖</div>
+            <div class="step-title">Classification</div>
+            <div class="step-description">SLDT + MSA</div>
         </div>
         """, unsafe_allow_html=True)
     
-    # Feature highlights
-    st.markdown("---")
-    st.markdown("### ✨ Key Features")
+    # Section: Techniques Used
+    st.markdown('<div class="section-header">Techniques & Algorithms</div>', unsafe_allow_html=True)
+    
+    techniques = [
+        "K-Means", "CLAHE", "Gaussian Blur", "LBP", "GLCM",
+        "Hough Transform", "SLDT", "MSA", "Morphology", "Edge Detection"
+    ]
+    
+    cols = st.columns(5)
+    for idx, tech in enumerate(techniques):
+        with cols[idx % 5]:
+            st.markdown(f"""
+            <div class="technique-badge">
+                {tech}
+            </div>
+            """, unsafe_allow_html=True)
+    
+    # Section: Key Features
+    st.markdown('<div class="section-header">Key Features</div>', unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("""
         <div class="feature-card">
-            <h3>🎯 Accurate Detection</h3>
-            <p>Machine learning powered classification with optimized feature selection</p>
+            <div class="feature-icon">🎯</div>
+            <div class="feature-title">Accurate Detection</div>
+            <div class="feature-description">
+                Machine learning powered classification with optimized 
+                feature selection using Moth Search Algorithm
+            </div>
         </div>
         """, unsafe_allow_html=True)
     
     with col2:
         st.markdown("""
         <div class="feature-card">
-            <h3>⚡ Fast Processing</h3>
-            <p>Automated pipeline processes images in seconds</p>
+            <div class="feature-icon">⚡</div>
+            <div class="feature-title">Fast Processing</div>
+            <div class="feature-description">
+                Automated pipeline processes chest X-Ray images 
+                in seconds with real-time progress tracking
+            </div>
         </div>
         """, unsafe_allow_html=True)
     
     with col3:
         st.markdown("""
         <div class="feature-card">
-            <h3>📊 Detailed Analysis</h3>
-            <p>Complete visualization of segmentation, features, and predictions</p>
+            <div class="feature-icon">📊</div>
+            <div class="feature-title">Detailed Analysis</div>
+            <div class="feature-description">
+                Complete visualization of segmentation masks, 
+                morphological operations, and extracted features
+            </div>
         </div>
         """, unsafe_allow_html=True)
     
-    # Upload prompt
-    st.markdown("---")
-    st.info("👈 **Get Started**: Upload a chest X-Ray image from the sidebar to begin analysis!")
+    # CTA Section
+    st.markdown("""
+    <div class="cta-container">
+        <div class="cta-title">Ready to Analyze?</div>
+        <div class="cta-description">
+            Upload a chest X-Ray image from the sidebar to get started with TB detection
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Technical details
-    with st.expander("🔬 Technical Details"):
+    with st.expander("🔬 Technical Details & Pipeline Breakdown"):
         st.markdown("""
-        #### Processing Pipeline:
+        ### Complete Processing Pipeline
         
-        1. **Preprocessing** 🔄
-           - Grayscale conversion
-           - Gaussian Blur (3×3 kernel) - noise reduction
-           - CLAHE (Contrast Limited Adaptive Histogram Equalization) - contrast enhancement
+        #### 1. **Preprocessing** 📥
+        - **Grayscale Conversion**: Convert RGB to grayscale
+        - **Gaussian Blur**: 3×3 kernel for noise reduction
+        - **CLAHE**: Contrast Limited Adaptive Histogram Equalization
+          - Clip Limit: 2.0
+          - Tile Grid Size: 8×8
         
-        2. **Segmentation** 🎯
-           - K-Means clustering (k=3) for lung region isolation
-           - Adaptive thresholding for nodule detection
-           - Adaptive thresholding for cavity detection
+        #### 2. **Segmentation** 🎯
+        - **K-Means Clustering**: Segment lung regions
+          - Number of clusters: 3
+          - Random state: 42
+        - **Adaptive Thresholding**: Detect nodules and cavities
+          - Block size: 21
+          - Method: Gaussian
         
-        3. **Morphological Operations** ⚙️
-           - Otsu thresholding
-           - Erosion & Dilation
-           - Opening & Closing operations
+        #### 3. **Morphological Operations** ⚙️
+        - **Otsu Thresholding**: Automatic threshold calculation
+        - **Erosion**: Remove noise (5×5 kernel)
+        - **Dilation**: Fill gaps (5×5 kernel)
+        - **Opening**: Remove small objects
+        - **Closing**: Fill small holes
         
-        4. **Feature Extraction** 📊
-           - **Edge Features**: Canny edge detection
-           - **Line Features**: Hough line transform
-           - **Texture Features**: GLCM (contrast, homogeneity)
-           - **Pattern Features**: LBP histogram (9 bins)
+        #### 4. **Feature Extraction** 📊
+        - **Edge Features**
+          - Canny edge detection (threshold: 100, 200)
+          - Total edge sum
         
-        5. **Classification** 🤖
-           - **SLDT**: Stacking Loopy Decision Tree
-           - **MSA**: Moth Search Algorithm for feature selection
-           - Output: Normal vs Tuberculosis with confidence score
+        - **Line Features**
+          - Hough line transform
+          - Line count and distribution
         
-        #### Model Performance:
-        - **Feature Selection**: Moth Search Algorithm
-        - **Base Classifiers**: Decision Tree + Random Forest
-        - **Meta Classifier**: Decision Tree
-        - **Optimization**: Grid Search (class weights + max depth)
+        - **Texture Features (GLCM)**
+          - Contrast: Measure of local variations
+          - Homogeneity: Measure of uniformity
+          - Distance: [1], Angle: [0]
+        
+        - **Pattern Features (LBP)**
+          - Local Binary Pattern histogram
+          - Points: 8, Radius: 1
+          - Method: uniform
+          - Output: 9 bins
+        
+        #### 5. **Classification** 🤖
+        - **Feature Selection**: Moth Search Algorithm (MSA)
+          - Population: 8 moths
+          - Iterations: 10
+          - Metric: F1-Score (macro)
+        
+        - **Classifier**: Stacking Loopy Decision Tree (SLDT)
+          - Base Learners:
+            - Decision Tree (entropy, balanced)
+            - Random Forest (10 trees)
+          - Meta Learner: Decision Tree
+          - Hyperparameter Tuning: Grid Search
+        
+        ### Model Architecture
+        ```
+        Input (14 features)
+              ↓
+        Feature Selection (MSA)
+              ↓
+        Selected Features
+              ↓
+        ┌─────────────────────┐
+        │  Base Learners      │
+        │  - Decision Tree    │
+        │  - Random Forest    │
+        └─────────────────────┘
+              ↓
+        ┌─────────────────────┐
+        │  Meta Learner       │
+        │  - Decision Tree    │
+        └─────────────────────┘
+              ↓
+        Output: Normal / TB
+        ```
+        
+        ### Feature Set (14 Features)
+        1. Edge Sum (Canny)
+        2. Number of Lines (Hough)
+        3. GLCM Contrast
+        4. GLCM Homogeneity
+        5-13. LBP Histogram (9 bins)
+        14. Corner Count
         """)
 
 # ============================================================================
