@@ -10,3 +10,5 @@ pyyaml
 fastapi
 uvicorn
 pytest
+streamlit
+plotly
