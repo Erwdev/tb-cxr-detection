@@ -5,6 +5,7 @@ Handles async-like processing with progress indicators
 import streamlit as st
 import os
 import sys
+import time
 
 # Add project root
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,6 +36,91 @@ st.set_page_config(
 )
 
 # ============================================================================
+# CUSTOM CSS FOR MARQUEE
+# ============================================================================
+st.markdown("""
+<style>
+    .marquee-container {
+        width: 100%;
+        overflow: hidden;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px 0;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+    
+    .marquee {
+        display: flex;
+        animation: scroll 30s linear infinite;
+        white-space: nowrap;
+    }
+    
+    .marquee-item {
+        display: inline-flex;
+        align-items: center;
+        margin: 0 30px;
+        padding: 15px 25px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .marquee-item:hover {
+        transform: scale(1.1);
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .marquee-icon {
+        font-size: 24px;
+        margin-right: 10px;
+    }
+    
+    .marquee-text {
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    @keyframes scroll {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+    
+    .pipeline-step {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 10px;
+        margin: 10px;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease;
+    }
+    
+    .pipeline-step:hover {
+        transform: translateY(-5px);
+    }
+    
+    .feature-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+        margin: 10px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ============================================================================
 # SESSION STATE INITIALIZATION
 # ============================================================================
 if 'analysis_results' not in st.session_state:
@@ -60,6 +146,179 @@ def create_progress_callback(progress_bar, status_text):
         progress_bar.progress(progress)
         status_text.text(message)
     return callback
+
+# ============================================================================
+# LANDING PAGE COMPONENTS
+# ============================================================================
+def render_landing_page():
+    """Render landing page with animated pipeline"""
+    
+    # Hero section
+    st.markdown("""
+    <div style='text-align: center; padding: 40px 0;'>
+        <h1 style='font-size: 3em; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                   -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+            🫁 TB Chest X-Ray Detection
+        </h1>
+        <p style='font-size: 1.2em; color: #666; margin-top: 10px;'>
+            AI-Powered Tuberculosis Detection from Medical Imaging
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Marquee of techniques
+    techniques = [
+        ("🔄", "K-Means Clustering"),
+        ("✨", "CLAHE Enhancement"),
+        ("🌀", "Gaussian Blur"),
+        ("🔍", "LBP Features"),
+        ("📊", "GLCM Texture"),
+        ("📏", "Hough Transform"),
+        ("🌳", "SLDT Classifier"),
+        ("🦋", "MSA Optimization"),
+        ("⚙️", "Morphology Ops"),
+        ("🎯", "Edge Detection"),
+    ]
+    
+    # Double the techniques for seamless loop
+    techniques_doubled = techniques + techniques
+    
+    marquee_html = """
+    <div class="marquee-container">
+        <div class="marquee">
+    """
+    
+    for icon, name in techniques_doubled:
+        marquee_html += f"""
+            <div class="marquee-item">
+                <span class="marquee-icon">{icon}</span>
+                <span class="marquee-text">{name}</span>
+            </div>
+        """
+    
+    marquee_html += """
+        </div>
+    </div>
+    """
+    
+    st.markdown(marquee_html, unsafe_allow_html=True)
+    
+    # Pipeline explanation
+    st.markdown("### 🔄 Complete Processing Pipeline")
+    
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    with col1:
+        st.markdown("""
+        <div class="pipeline-step">
+            📥<br>Preprocessing<br>
+            <small>CLAHE + Gaussian</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div class="pipeline-step">
+            🎯<br>Segmentation<br>
+            <small>K-Means (k=3)</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div class="pipeline-step">
+            ⚙️<br>Morphology<br>
+            <small>Erosion + Dilation</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col4:
+        st.markdown("""
+        <div class="pipeline-step">
+            📊<br>Features<br>
+            <small>LBP + GLCM + Hough</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col5:
+        st.markdown("""
+        <div class="pipeline-step">
+            🤖<br>Classification<br>
+            <small>SLDT + MSA</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Feature highlights
+    st.markdown("---")
+    st.markdown("### ✨ Key Features")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+        <div class="feature-card">
+            <h3>🎯 Accurate Detection</h3>
+            <p>Machine learning powered classification with optimized feature selection</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div class="feature-card">
+            <h3>⚡ Fast Processing</h3>
+            <p>Automated pipeline processes images in seconds</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div class="feature-card">
+            <h3>📊 Detailed Analysis</h3>
+            <p>Complete visualization of segmentation, features, and predictions</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Upload prompt
+    st.markdown("---")
+    st.info("👈 **Get Started**: Upload a chest X-Ray image from the sidebar to begin analysis!")
+    
+    # Technical details
+    with st.expander("🔬 Technical Details"):
+        st.markdown("""
+        #### Processing Pipeline:
+        
+        1. **Preprocessing** 🔄
+           - Grayscale conversion
+           - Gaussian Blur (3×3 kernel) - noise reduction
+           - CLAHE (Contrast Limited Adaptive Histogram Equalization) - contrast enhancement
+        
+        2. **Segmentation** 🎯
+           - K-Means clustering (k=3) for lung region isolation
+           - Adaptive thresholding for nodule detection
+           - Adaptive thresholding for cavity detection
+        
+        3. **Morphological Operations** ⚙️
+           - Otsu thresholding
+           - Erosion & Dilation
+           - Opening & Closing operations
+        
+        4. **Feature Extraction** 📊
+           - **Edge Features**: Canny edge detection
+           - **Line Features**: Hough line transform
+           - **Texture Features**: GLCM (contrast, homogeneity)
+           - **Pattern Features**: LBP histogram (9 bins)
+        
+        5. **Classification** 🤖
+           - **SLDT**: Stacking Loopy Decision Tree
+           - **MSA**: Moth Search Algorithm for feature selection
+           - Output: Normal vs Tuberculosis with confidence score
+        
+        #### Model Performance:
+        - **Feature Selection**: Moth Search Algorithm
+        - **Base Classifiers**: Decision Tree + Random Forest
+        - **Meta Classifier**: Decision Tree
+        - **Optimization**: Grid Search (class weights + max depth)
+        """)
 
 # ============================================================================
 # MAIN APP
@@ -97,10 +356,26 @@ def main():
             "This system uses machine learning to detect tuberculosis "
             "from chest X-ray images. Upload an image and click Analyze."
         )
+        
+        st.markdown("---")
+        st.markdown("### 👥 Tim Pengembang")
+        st.markdown("""
+        - **Azhar Maulana**  
+          *Preprocessing*
+        
+        - **Revy Satya Gunawan**  
+          *Segmentation*
+        
+        - **Raditya Nathaniel Nugroho**  
+          *Morphological Processing*
+        
+        - **Benedictus Erwin Widianto**  
+          *Feature Extraction & Lead*
+        """)
     
-    # Main Area
+    # Main Area - Show landing page if no image uploaded
     if uploaded_file is None:
-        st.info("👈 Please upload an X-Ray image to begin analysis")
+        render_landing_page()
         return
     
     # Analyze Button
