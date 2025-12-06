@@ -1,6 +1,6 @@
 """
-TB Detection Pipeline - Complete System
-Preprocessing → Segmentation → Morphology → Feature Extraction
+TB Detection Pipeline - Complete System (Corrected Logic)
+Preprocessing → Segmentation → Morphology (Sequential) → Feature Extraction
 """
 
 import cv2
@@ -90,7 +90,7 @@ def segment_lungs(img: np.ndarray) -> dict:
 
 
 # ============================================================================
-# STEP 3: MORPHOLOGICAL PROCESSING
+# STEP 3: MORPHOLOGICAL PROCESSING (FIXED: SEQUENTIAL)
 # ============================================================================
 def otsu_threshold(img):
     """Otsu thresholding manual"""
@@ -120,20 +120,43 @@ def otsu_threshold(img):
     
     return threshold, (img > threshold).astype(np.uint8)
 
+def fill_holes(mask: np.ndarray) -> np.ndarray:
+    """[NEW] Isi lubang terbesar (paru-paru)"""
+    cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    filled_mask = np.zeros(mask.shape, dtype=np.uint8)
+    
+    if cnts:
+        # Find largest contour by area
+        c = max(cnts, key=cv2.contourArea)
+        cv2.drawContours(filled_mask, [c], -1, 255, -1)
+    
+    return filled_mask
 
-def apply_morphology(mask: np.ndarray, kernel_size: int = 5) -> dict:
-    """Aplikasikan operasi morfologi pada mask"""
+def apply_morphology(mask: np.ndarray, kernel_size: int = 5, do_fill: bool = True) -> dict:
+    """
+    [FIXED] Aplikasikan operasi morfologi secara SEKUENSIAL:
+    Otsu -> Opening -> Closing -> Hole Filling
+    """
     kernel = np.ones((kernel_size, kernel_size), np.uint8)
     
-    # Otsu thresholding
+    # 0. Otsu thresholding
     threshold_val, mask_bin = otsu_threshold(mask)
     mask_bin_255 = (mask_bin * 255).astype(np.uint8)
     
-    # Operasi morfologi
+    # 1. Opening: Hapus noise kecil
+    opened = cv2.morphologyEx(mask_bin_255, cv2.MORPH_OPEN, kernel)
+    
+    # 2. Closing: Tutup lubang kecil (input = opened)
+    closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, kernel)
+    
+    # 3. Hole Filling (Optional, usually for lungs)
+    final_result = closed
+    if do_fill:
+        final_result = fill_holes(closed)
+    
+    # Visualization helpers (optional)
     eroded = cv2.erode(mask_bin_255, kernel, iterations=1)
     dilated = cv2.dilate(mask_bin_255, kernel, iterations=1)
-    opened = cv2.morphologyEx(mask_bin_255, cv2.MORPH_OPEN, kernel)
-    closed = cv2.morphologyEx(mask_bin_255, cv2.MORPH_CLOSE, kernel)
     
     return {
         "original": mask,
@@ -142,6 +165,7 @@ def apply_morphology(mask: np.ndarray, kernel_size: int = 5) -> dict:
         "dilated": dilated,
         "opened": opened,
         "closed": closed,
+        "final": final_result, # Use this one!
         "threshold_value": threshold_val
     }
 
@@ -202,15 +226,21 @@ def process_single_image(image_path: str, output_dir: str = None, visualize: boo
     
     # STEP 3: Morphological Processing
     print("→ Step 3: Morphological Processing...")
-    lung_morph = apply_morphology(segments['lung'], kernel_size=5)
-    nodule_morph = apply_morphology(segments['nodule'], kernel_size=3)
-    cavity_morph = apply_morphology(segments['cavity'], kernel_size=3)
+    
+    # LUNG: Use Fill Holes (True)
+    lung_morph = apply_morphology(segments['lung'], kernel_size=5, do_fill=True)
+    
+    # NODULE/CAVITY: No Fill Holes (False) - prevents selecting only 1 nodule
+    nodule_morph = apply_morphology(segments['nodule'], kernel_size=3, do_fill=False)
+    cavity_morph = apply_morphology(segments['cavity'], kernel_size=3, do_fill=False)
     
     # STEP 4: Feature Extraction
     print("→ Step 4: Feature Extraction...")
-    lung_features = extract_lbp_features(preprocessed, segments['lung'])
-    nodule_features = extract_lbp_features(preprocessed, segments['nodule'])
-    cavity_features = extract_lbp_features(preprocessed, segments['cavity'])
+    
+    # [FIXED] Use the 'final' cleaned mask, not the raw segment
+    lung_features = extract_lbp_features(preprocessed, lung_morph['final'])
+    nodule_features = extract_lbp_features(preprocessed, nodule_morph['final'])
+    cavity_features = extract_lbp_features(preprocessed, cavity_morph['final'])
     
     # Hasil akhir
     results = {
@@ -233,7 +263,7 @@ def process_single_image(image_path: str, output_dir: str = None, visualize: boo
         }
     }
     
-    # Visualisasi
+    # Visualisasi (Updated to show 'final')
     if visualize:
         visualize_pipeline(
             preprocessed, 
@@ -255,9 +285,9 @@ def process_single_image(image_path: str, output_dir: str = None, visualize: boo
         
         # Simpan gambar hasil
         cv2.imwrite(os.path.join(output_dir, f"{basename}_preprocessed.png"), preprocessed)
-        cv2.imwrite(os.path.join(output_dir, f"{basename}_lung_mask.png"), segments['lung'])
-        cv2.imwrite(os.path.join(output_dir, f"{basename}_nodule_mask.png"), segments['nodule'])
-        cv2.imwrite(os.path.join(output_dir, f"{basename}_cavity_mask.png"), segments['cavity'])
+        cv2.imwrite(os.path.join(output_dir, f"{basename}_lung_mask.png"), lung_morph['final']) # Save the CLEAN one
+        cv2.imwrite(os.path.join(output_dir, f"{basename}_nodule_mask.png"), nodule_morph['final'])
+        cv2.imwrite(os.path.join(output_dir, f"{basename}_cavity_mask.png"), cavity_morph['final'])
         
         print(f"✓ Results saved to: {output_dir}")
     
@@ -276,66 +306,67 @@ def visualize_pipeline(preprocessed, segments, lung_morph, nodule_morph, cavity_
     axes[0, 0].axis('off')
     
     axes[0, 1].imshow(segments['lung'], cmap='gray')
-    axes[0, 1].set_title('2. Lung Mask')
+    axes[0, 1].set_title('2. Lung Mask (Raw)')
     axes[0, 1].axis('off')
     
     axes[0, 2].imshow(segments['nodule'], cmap='gray')
-    axes[0, 2].set_title('3. Nodule Mask')
+    axes[0, 2].set_title('3. Nodule Mask (Raw)')
     axes[0, 2].axis('off')
     
     axes[0, 3].imshow(segments['cavity'], cmap='gray')
-    axes[0, 3].set_title('4. Cavity Mask')
+    axes[0, 3].set_title('4. Cavity Mask (Raw)')
     axes[0, 3].axis('off')
     
     # Row 2: Lung Morphology
     axes[1, 0].imshow(lung_morph['otsu_binary'], cmap='gray')
-    axes[1, 0].set_title(f"Lung Otsu (T={lung_morph['threshold_value']})")
+    axes[1, 0].set_title(f"Lung Otsu")
     axes[1, 0].axis('off')
     
-    axes[1, 1].imshow(lung_morph['eroded'], cmap='gray')
-    axes[1, 1].set_title('Lung Erosion')
+    axes[1, 1].imshow(lung_morph['opened'], cmap='gray')
+    axes[1, 1].set_title('Lung Opening')
     axes[1, 1].axis('off')
     
-    axes[1, 2].imshow(lung_morph['dilated'], cmap='gray')
-    axes[1, 2].set_title('Lung Dilation')
+    axes[1, 2].imshow(lung_morph['closed'], cmap='gray')
+    axes[1, 2].set_title('Lung Closing')
     axes[1, 2].axis('off')
     
-    axes[1, 3].imshow(lung_morph['closed'], cmap='gray')
-    axes[1, 3].set_title('Lung Closing')
+    # [UPDATED] Show Final Clean Mask instead of just Closing
+    axes[1, 3].imshow(lung_morph['final'], cmap='gray')
+    axes[1, 3].set_title('Lung FINAL (Filled)')
     axes[1, 3].axis('off')
     
     # Row 3: Nodule Morphology
     axes[2, 0].imshow(nodule_morph['otsu_binary'], cmap='gray')
-    axes[2, 0].set_title(f"Nodule Otsu (T={nodule_morph['threshold_value']})")
+    axes[2, 0].set_title(f"Nodule Otsu")
     axes[2, 0].axis('off')
     
-    axes[2, 1].imshow(nodule_morph['eroded'], cmap='gray')
-    axes[2, 1].set_title('Nodule Erosion')
+    axes[2, 1].imshow(nodule_morph['opened'], cmap='gray')
+    axes[2, 1].set_title('Nodule Opening')
     axes[2, 1].axis('off')
     
-    axes[2, 2].imshow(nodule_morph['opened'], cmap='gray')
-    axes[2, 2].set_title('Nodule Opening')
+    axes[2, 2].imshow(nodule_morph['closed'], cmap='gray')
+    axes[2, 2].set_title('Nodule Closing')
     axes[2, 2].axis('off')
     
-    axes[2, 3].imshow(nodule_morph['closed'], cmap='gray')
-    axes[2, 3].set_title('Nodule Closing')
+    axes[2, 3].imshow(nodule_morph['final'], cmap='gray')
+    axes[2, 3].set_title('Nodule FINAL')
     axes[2, 3].axis('off')
     
     # Row 4: Cavity Morphology
     axes[3, 0].imshow(cavity_morph['otsu_binary'], cmap='gray')
-    axes[3, 0].set_title(f"Cavity Otsu (T={cavity_morph['threshold_value']})")
+    axes[3, 0].set_title(f"Cavity Otsu")
     axes[3, 0].axis('off')
     
-    axes[3, 1].imshow(cavity_morph['eroded'], cmap='gray')
-    axes[3, 1].set_title('Cavity Erosion')
+    axes[3, 1].imshow(cavity_morph['opened'], cmap='gray')
+    axes[3, 1].set_title('Cavity Opening')
     axes[3, 1].axis('off')
     
-    axes[3, 2].imshow(cavity_morph['opened'], cmap='gray')
-    axes[3, 2].set_title('Cavity Opening')
+    axes[3, 2].imshow(cavity_morph['closed'], cmap='gray')
+    axes[3, 2].set_title('Cavity Closing')
     axes[3, 2].axis('off')
     
-    axes[3, 3].imshow(cavity_morph['closed'], cmap='gray')
-    axes[3, 3].set_title('Cavity Closing')
+    axes[3, 3].imshow(cavity_morph['final'], cmap='gray')
+    axes[3, 3].set_title('Cavity FINAL')
     axes[3, 3].axis('off')
     
     plt.tight_layout()
@@ -395,6 +426,12 @@ if __name__ == "__main__":
     print("\nMODE 1: Single Image Processing")
     single_image_path = r"D:\UGM\Pengantar Citra Digital\Tbc\TB_Chest_Radiography_Database\Tuberculosis\Tuberculosis-5"
     
+    # Check current directory if path doesn't exist
+    if not os.path.exists(single_image_path):
+        print(f"⚠ Note: Path '{single_image_path}' not found.")
+        print("  Running on sample data/raw/Normal/Normal-1.png if available...")
+        single_image_path = "data/raw/Normal/Normal-1.png"
+
     if os.path.exists(single_image_path):
         result = process_single_image(
             single_image_path, 
@@ -413,16 +450,19 @@ if __name__ == "__main__":
     
     classes = ["Normal", "Tuberculosis"]
     
-    for cls in classes:
-        input_folder = os.path.join(input_root, cls)
-        
-        if os.path.exists(input_folder):
-            process_batch(
-                input_folder=input_folder,
-                output_folder=output_root,
-                class_name=cls
-            )
-        else:
-            print(f"⚠ Folder not found: {input_folder}")
+    if os.path.exists(input_root):
+        for cls in classes:
+            input_folder = os.path.join(input_root, cls)
+            
+            if os.path.exists(input_folder):
+                process_batch(
+                    input_folder=input_folder,
+                    output_folder=output_root,
+                    class_name=cls
+                )
+            else:
+                print(f"⚠ Folder not found: {input_folder}")
+    else:
+        print(f"Skipping batch processing (Folder not found: {input_root})")
     
     print("\n✓ All processing complete!")
